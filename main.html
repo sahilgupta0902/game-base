@@ -1,0 +1,131 @@
+<html>
+
+<head>
+
+   <script src="js/three.js"></script>
+   <script src="https://threejs.org/build/three.min.js"></script>
+
+   <style>
+       #container {
+           position: absolute;
+           width: 100%;
+           height: 100%;
+       }
+   </style>
+</head>
+
+<body>
+   <div id="container"></div>
+
+   <script>
+       var geometry3, material3;
+       var sphere3 = [];
+       const container = document.getElementById('container');
+       const scene = new THREE.Scene();
+       var sky, sunSphere;
+       scene.background = new THREE.Color('skyblue');
+
+       const camera = new THREE.PerspectiveCamera(70, container.clientWidth / container.clientHeight, 0.01, 300);
+       camera.position.set(0, 10, 6);
+       camera.rotateX(-Math.PI / 8);
+
+    //    function sk() {
+    //        try {
+
+    //            sky = new Sky();
+    //            sky.scale.setScalar(450000);
+    //            scene.add(sky);
+    //            // Add Sun Helper
+    //            sunSphere = new THREE.Mesh(
+    //                new THREE.SphereBufferGeometry(20000, 16, :sunglasses:,
+    //                new THREE.MeshBasicMaterial({
+    //                    color: 0xffffff
+    //                })
+    //            );
+    //            sunSphere.position.y = -700000;
+    //            sunSphere.visible = false;
+    //            scene.add(sunSphere);
+
+    //        } catch (ew) {
+    //            console.log(ew);
+    //        }
+
+    //    }
+    //    sk();
+
+
+
+
+       var heroSphere;
+       var sphereGeometry = new THREE.SphereGeometry(0.7, 20, 20);
+       var sphereMaterial = new THREE.MeshStandardMaterial({
+           color: 0xFF0000,
+           shading: THREE.FlatShading
+       })
+       heroSphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
+       heroSphere.receiveShadow = true;
+       heroSphere.castShadow = true;
+       heroSphere.position.set(0, 6.5, 2);
+       scene.add(heroSphere);
+
+
+       //const geometry = new THREE.SphereBufferGeometry( 2, 32, 32 );
+
+       var p = 0;
+       var sub, colm;
+       for (var d = 0; d < 50; d++) {
+
+           geometry3 = new THREE.BoxBufferGeometry(10, 0, 12);
+           material3 = new THREE.MeshStandardMaterial({
+
+
+               color: 0xFF0000
+
+
+           });
+
+           sphere3[d] = new THREE.Mesh(geometry3, material3);
+           sphere3[d].position.set(0, 5, -14 * p);
+           p++;
+           scene.add(sphere3[d]);
+
+       }
+
+       const light = new THREE.DirectionalLight(0x404040, 5);
+       scene.add(light);
+
+       const renderer = new THREE.WebGLRenderer({
+           antialias: true
+       });
+       renderer.setSize(container.clientWidth, container.clientHeight);
+       renderer.setPixelRatio(window.devicePixelRatio);
+
+       container.appendChild(renderer.domElement);
+
+       renderer.render(scene, camera);
+
+       var xi = 1;
+
+       function animate() {
+
+           for (var f = 0; f < 50; f++) {
+               sphere3[f].position.z += 0.139;
+           }
+           heroSphere.rotation.x -= 0.05;
+           requestAnimationFrame(animate);
+           renderer.render(scene, camera);
+       }
+
+       function onWindowResize() {
+           camera.aspect = container.clientWidth / container.clientHeight;
+
+           renderer.setSize(container.clientWidth, container.clientHeight);
+           camera.updateProjectionMatrix();
+       }
+
+       window.addEventListener('resize', onWindowResize);
+
+       animate();
+   </script>
+</body>
+</html>
