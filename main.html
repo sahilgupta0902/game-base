@@ -1,131 +1,169 @@
 <html>
 
 <head>
+    <script src="/js/three.js"></script>
+    <script src="https://threejs.org/build/three.min.js"></script>
+    <script src="/js/Sky.js"></script>
+    <!-- <script src="/js/dat.gui.module.js"></script>  -->
 
-   <script src="js/three.js"></script>
-   <script src="https://threejs.org/build/three.min.js"></script>
-
-   <style>
-       #container {
-           position: absolute;
-           width: 100%;
-           height: 100%;
-       }
-   </style>
+    <style>
+        #container {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+        }
+    </style>
 </head>
 
 <body>
-   <div id="container"></div>
+    <div id="container"></div>
 
-   <script>
-       var geometry3, material3;
-       var sphere3 = [];
-       const container = document.getElementById('container');
-       const scene = new THREE.Scene();
-       var sky, sunSphere;
-       scene.background = new THREE.Color('skyblue');
+    <script>
+        var geometry3, material3;
+        var sphere3 = [];
+        const container = document.getElementById('container');
+        const scene = new THREE.Scene();
+        var sky, sunSphere;
+        scene.background = new THREE.Color('skyblue');
 
-       const camera = new THREE.PerspectiveCamera(70, container.clientWidth / container.clientHeight, 0.01, 300);
-       camera.position.set(0, 10, 6);
-       camera.rotateX(-Math.PI / 8);
-
-    //    function sk() {
-    //        try {
-
-    //            sky = new Sky();
-    //            sky.scale.setScalar(450000);
-    //            scene.add(sky);
-    //            // Add Sun Helper
-    //            sunSphere = new THREE.Mesh(
-    //                new THREE.SphereBufferGeometry(20000, 16, :sunglasses:,
-    //                new THREE.MeshBasicMaterial({
-    //                    color: 0xffffff
-    //                })
-    //            );
-    //            sunSphere.position.y = -700000;
-    //            sunSphere.visible = false;
-    //            scene.add(sunSphere);
-
-    //        } catch (ew) {
-    //            console.log(ew);
-    //        }
-
-    //    }
-    //    sk();
+        const camera = new THREE.PerspectiveCamera(70, container.clientWidth / container.clientHeight, 0.01, 300);
+        camera.position.set(0, 10, 6);
+        camera.rotateX(-Math.PI / 8);
 
 
+        function createSky() {
+            // Add Sky
+            const sky = new THREE.Sky();
+            sky.scale.setScalar(200);
+            sky.name = 'Sky';
+            scene.add(sky);
+
+            // Add Sun Helper
+            const sunSphere = new THREE.Mesh(
+                new THREE.SphereBufferGeometry(20000, 16, 8),
+                new THREE.MeshBasicMaterial({
+                    color: 0xffffff
+                })
+            );
+            sunSphere.position.y = 700000;
+            sunSphere.visible = false;
+            scene.add(sunSphere);
+
+            const effectController = {
+                turbidity: 10,
+                rayleigh: 2,
+                mieCoefficient: 0.005,
+                mieDirectionalG: 0.8,
+                luminance: 1,
+                inclination: 0.49, // elevation / inclination
+                azimuth: 0.25, // Facing front,
+                sun: !true
+            };
+            const distance = 400000;
+
+            const uniforms = sky.material.uniforms;
+            uniforms["turbidity"].value = effectController.turbidity;
+            uniforms["rayleigh"].value = effectController.rayleigh;
+            uniforms["luminance"].value = effectController.luminance;
+            uniforms["mieCoefficient"].value = effectController.mieCoefficient;
+            uniforms["mieDirectionalG"].value = effectController.mieDirectionalG;
+            const theta = Math.PI * (effectController.inclination - 0.5);
+            const phi = 2 * Math.PI * (effectController.azimuth - 0.5);
+            sunSphere.position.x = distance * Math.cos(phi);
+            sunSphere.position.y = distance * Math.sin(phi) * Math.sin(theta);
+            sunSphere.position.z = distance * Math.sin(phi) * Math.cos(theta);
+            sunSphere.visible = effectController.sun;
+            uniforms["sunPosition"].value.copy(sunSphere.position);
+
+        }
 
 
-       var heroSphere;
-       var sphereGeometry = new THREE.SphereGeometry(0.7, 20, 20);
-       var sphereMaterial = new THREE.MeshStandardMaterial({
-           color: 0xFF0000,
-           shading: THREE.FlatShading
-       })
-       heroSphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
-       heroSphere.receiveShadow = true;
-       heroSphere.castShadow = true;
-       heroSphere.position.set(0, 6.5, 2);
-       scene.add(heroSphere);
+        createSky();
+
+        var heroSphere;
+        var sphereGeometry = new THREE.SphereGeometry(0.7, 20, 20, 0, Math.PI * 2, 0, Math.PI * 2);
+        var sphereMaterial = new THREE.MeshStandardMaterial({
+            color: 0xFF0000,
+            shading: THREE.FlatShading
+        })
+        heroSphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
+        heroSphere.receiveShadow = true;
+        heroSphere.castShadow = true;
+        heroSphere.position.set(0, 6.5, 2);
+        scene.add(heroSphere);
 
 
-       //const geometry = new THREE.SphereBufferGeometry( 2, 32, 32 );
+        //const geometry = new THREE.SphereBufferGeometry( 2, 32, 32 );
 
-       var p = 0;
-       var sub, colm;
-       for (var d = 0; d < 50; d++) {
+        var p = 0;
+        var sub, colm;
+        for (var d = 0; d < 50; d++) {
 
-           geometry3 = new THREE.BoxBufferGeometry(10, 0, 12);
-           material3 = new THREE.MeshStandardMaterial({
-
-
-               color: 0xFF0000
+            geometry3 = new THREE.BoxBufferGeometry(10, 0, 12);
+            material3 = new THREE.MeshStandardMaterial({
 
 
-           });
+                color: 0xFF0000
 
-           sphere3[d] = new THREE.Mesh(geometry3, material3);
-           sphere3[d].position.set(0, 5, -14 * p);
-           p++;
-           scene.add(sphere3[d]);
 
-       }
+            });
 
-       const light = new THREE.DirectionalLight(0x404040, 5);
-       scene.add(light);
+            sphere3[d] = new THREE.Mesh(geometry3, material3);
+            sphere3[d].position.set(0, 5, -14 * p);
+            p++;
+            scene.add(sphere3[d]);
 
-       const renderer = new THREE.WebGLRenderer({
-           antialias: true
-       });
-       renderer.setSize(container.clientWidth, container.clientHeight);
-       renderer.setPixelRatio(window.devicePixelRatio);
+        }
 
-       container.appendChild(renderer.domElement);
+        const light = new THREE.DirectionalLight(0x404040, 5);
+        scene.add(light);
 
-       renderer.render(scene, camera);
+        const renderer = new THREE.WebGLRenderer({
+            antialias: true
+        });
+        renderer.setSize(container.clientWidth, container.clientHeight);
+        renderer.setPixelRatio(window.devicePixelRatio);
 
-       var xi = 1;
+        container.appendChild(renderer.domElement);
 
-       function animate() {
+        renderer.render(scene, camera);
 
-           for (var f = 0; f < 50; f++) {
-               sphere3[f].position.z += 0.139;
-           }
-           heroSphere.rotation.x -= 0.05;
-           requestAnimationFrame(animate);
-           renderer.render(scene, camera);
-       }
+        var xi = 1;
 
-       function onWindowResize() {
-           camera.aspect = container.clientWidth / container.clientHeight;
+        var clock = new THREE.Clock();
+        console.log(clock);
+        var time = 0;
+        var delta = 0;
 
-           renderer.setSize(container.clientWidth, container.clientHeight);
-           camera.updateProjectionMatrix();
-       }
+        function animate() {
 
-       window.addEventListener('resize', onWindowResize);
+            for (var f = 0; f < 50; f++) {
+                sphere3[f].position.z += 0.139;
+            }
 
-       animate();
-   </script>
+            delta = clock.getDelta();
+
+            time += delta;
+
+            heroSphere.position.y = 6.5 + Math.abs(Math.sin(time * 5)) * 2;
+            heroSphere.rotation.x -= 0.185;
+
+            requestAnimationFrame(animate);
+            renderer.render(scene, camera);
+        }
+
+        function onWindowResize() {
+            camera.aspect = container.clientWidth / container.clientHeight;
+
+            renderer.setSize(container.clientWidth, container.clientHeight);
+            camera.updateProjectionMatrix();
+        }
+
+        window.addEventListener('resize', onWindowResize);
+
+
+        animate();
+    </script>
 </body>
+
 </html>
