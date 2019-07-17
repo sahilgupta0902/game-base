@@ -19,8 +19,12 @@
     <div id="container"></div>
 
     <script>
-        var geometry3, material3;
-        var sphere3 = [];
+        var track_geometry, track_material;
+        var track_array = [];
+
+        var star_geometry, star_material;
+        var star_array = [];
+
         const container = document.getElementById('container');
         const scene = new THREE.Scene();
         var sky, sunSphere;
@@ -80,17 +84,17 @@
 
         createSky();
 
-        var heroSphere;
-        var sphereGeometry = new THREE.SphereGeometry(0.7, 20, 20, 0, Math.PI * 2, 0, Math.PI * 2);
-        var sphereMaterial = new THREE.MeshStandardMaterial({
+        var ball;
+        var ball_geometry = new THREE.SphereGeometry(0.7, 20, 20, 0, Math.PI * 2, 0, Math.PI * 2);
+        var ball_material = new THREE.MeshStandardMaterial({
             color: 0xFF0000,
             shading: THREE.FlatShading
         })
-        heroSphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
-        heroSphere.receiveShadow = true;
-        heroSphere.castShadow = true;
-        heroSphere.position.set(0, 6.5, 2);
-        scene.add(heroSphere);
+        ball = new THREE.Mesh(ball_geometry, ball_material);
+        ball.receiveShadow = true;
+        ball.castShadow = true;
+        ball.position.set(0, 6.5, 2);
+        scene.add(ball);
 
 
         //const geometry = new THREE.SphereBufferGeometry( 2, 32, 32 );
@@ -99,8 +103,8 @@
         var sub, colm;
         for (var d = 0; d < 50; d++) {
 
-            geometry3 = new THREE.BoxBufferGeometry(10, 0, 12);
-            material3 = new THREE.MeshStandardMaterial({
+            track_geometry = new THREE.BoxBufferGeometry(10, 0, 12);
+            track_material = new THREE.MeshStandardMaterial({
 
 
                 color: 0xFF0000
@@ -108,10 +112,27 @@
 
             });
 
-            sphere3[d] = new THREE.Mesh(geometry3, material3);
-            sphere3[d].position.set(0, 5, -14 * p);
+            track_array[d] = new THREE.Mesh(track_geometry, track_material);
+            track_array[d].position.set(0, 5, -14 * p);
             p++;
-            scene.add(sphere3[d]);
+            scene.add(track_array[d]);
+
+            star_geometry = new THREE.ConeGeometry(1, 4, 7);
+            star_material = new THREE.MeshStandardMaterial({
+
+
+                color: 0x0000FF
+
+
+            });
+
+            star_array[d] = new THREE.Mesh(star_geometry, star_material);
+            star_array[d].position.set(0, 10, -100 * p);
+
+            scene.add(star_array[d]);
+
+
+
 
         }
 
@@ -138,15 +159,16 @@
         function animate() {
 
             for (var f = 0; f < 50; f++) {
-                sphere3[f].position.z += 0.139;
+                track_array[f].position.z += 0.139;
+                star_array[f].position.z += 0.139;
             }
 
             delta = clock.getDelta();
 
             time += delta;
 
-            heroSphere.position.y = 6.5 + Math.abs(Math.sin(time * 5)) * 2;
-            heroSphere.rotation.x -= 0.185;
+            ball.position.y = 6.5 + Math.abs(Math.sin(time * 5)) * 2;
+            ball.rotation.x -= 0.185;
 
             requestAnimationFrame(animate);
             renderer.render(scene, camera);
